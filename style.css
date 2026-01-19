@@ -1,0 +1,152 @@
+/**
+ * THE TETHER // UI CALIBRATION
+ * AESTHETIC: NEON BRUTALISM / GLITCH
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+:root {
+    --neon-red: #ff003c;
+    --neon-cyan: #00f2ff;
+    --bg-black: #050505;
+    --glass: rgba(255, 255, 255, 0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-black);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    height: 100vh;
+}
+
+#game-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+/* --- THE TETHER HUD --- */
+#ui-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 20px solid transparent; /* Visual border for "Link" effect */
+    transition: border-color 0.2s;
+}
+
+#connection-status {
+    width: 300px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-left: 4px solid var(--neon-cyan);
+}
+
+.status-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#sync-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+#sync-level {
+    width: 100%;
+    height: 100%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 15px var(--neon-cyan);
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* --- GAME STATS --- */
+#game-stats {
+    align-self: flex-end;
+    text-align: right;
+    background: var(--glass);
+    padding: 15px;
+    border-right: 4px solid var(--neon-cyan);
+}
+
+.stat {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+#comms-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    letter-spacing: 5px;
+    animation: blink 1s infinite;
+}
+
+/* --- CRITICAL ALERT STATE --- */
+.danger #sync-level {
+    background: var(--neon-red);
+    box-shadow: 0 0 20px var(--neon-red);
+}
+
+.danger #ui-overlay {
+    border-color: rgba(255, 0, 60, 0.2);
+}
+
+/* --- SCREENS --- */
+#death-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: auto;
+}
+
+#death-screen h1 {
+    font-size: 3rem;
+    color: var(--neon-red);
+    margin-bottom: 20px;
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 15px 40px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: var(--neon-cyan);
+    color: black;
+}
+
+.hidden { display: none !important; }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
