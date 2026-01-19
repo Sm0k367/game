@@ -9,7 +9,15 @@
 <body>
     <canvas id="game-canvas"></canvas>
 
-    <div id="ui-overlay">
+    <div id="start-screen">
+        <div class="glitch-wrapper">
+            <h1 class="glitch" data-text="THE TETHER">THE TETHER</h1>
+        </div>
+        <p>COOPERATION IS THE ONLY LOGIC.</p>
+        <button id="init-button">INITIATE LINK</button>
+    </div>
+
+    <div id="ui-overlay" class="hidden">
         <div id="connection-status">
             <div class="status-label">TETHERED TO: <span id="partner-id">SEARCHING...</span></div>
             <div id="sync-bar-container">
@@ -31,6 +39,8 @@
         <p>YOUR PARTNER FAILED. YOU HAVE BEEN RECALIBRATED.</p>
         <button onclick="location.reload()">RE-TETHER</button>
     </div>
+
+    <audio id="bg-music" loop src="Game.mp3"></audio>
 
     <script type="module" src="main.js"></script>
 </body>
