@@ -1,12 +1,8 @@
-/** * THE TETHER // UI CALIBRATION 
- * UPDATED: DYNAMIC GLOW & COLOR SYNC
- */
-
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
 
 :root {
-    /* These will be updated by the Hue Engine in JS */
-    --current-hue: #00f2ff; 
+    /* These variables are controlled by main.js */
+    --current-hue: hsl(180, 100%, 50%); 
     --neon-red: #ff003c;
     --bg-black: #050505;
 }
@@ -27,7 +23,30 @@ body {
     z-index: 1;
 }
 
-/* --- THE PULSING HUD --- */
+/* --- START SCREEN --- */
+#start-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--bg-black);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.glitch {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    position: relative;
+    color: var(--current-hue);
+    text-shadow: 2px 2px var(--neon-red);
+    transition: color 0.1s ease;
+}
+
+/* --- HUD OVERLAY --- */
 #ui-overlay {
     position: fixed;
     inset: 0;
@@ -37,58 +56,82 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* The border now breathes with the game state */
     border: 15px solid rgba(255, 255, 255, 0.03);
-    animation: borderBreathe 4s ease-in-out infinite alternate;
-}
-
-@keyframes borderBreathe {
-    from { border-color: rgba(255, 255, 255, 0.03); }
-    to { border-color: rgba(0, 242, 255, 0.1); }
+    transition: border-color 0.5s ease;
 }
 
 #connection-status {
     width: 320px;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    padding: 25px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 20px;
     border-left: 5px solid var(--current-hue);
-    box-shadow: -10px 0 30px rgba(0, 242, 255, 0.1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
 }
 
 #sync-level {
     width: 100%;
     height: 10px;
-    background: linear-gradient(90deg, var(--current-hue), #ffffff);
+    background: var(--current-hue);
     box-shadow: 0 0 20px var(--current-hue);
     transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* --- MORPHING ELEMENTS --- */
-.glitch {
-    font-size: 5rem;
+.status-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#game-stats {
+    align-self: flex-end;
+    text-align: right;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-right: 5px solid var(--current-hue);
+}
+
+/* --- GAME OVER SCREEN --- */
+#death-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--current-hue);
+    color: var(--current-hue);
+    padding: 15px 40px;
+    font-family: 'JetBrains Mono', monospace;
     font-weight: 800;
-    letter-spacing: -2px;
-    animation: textMorph 2s infinite alternate;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s;
 }
 
-@keyframes textMorph {
-    0% { transform: scale(1); filter: hue-rotate(0deg); }
-    100% { transform: scale(1.05); filter: hue-rotate(90deg); }
+button:hover {
+    background: var(--current-hue);
+    color: black;
 }
 
-/* --- DANGER STATE --- */
+.hidden { display: none !important; }
+
+/* Danger State Shake */
 .danger #connection-status {
     border-left-color: var(--neon-red);
-    box-shadow: -10px 0 40px rgba(255, 0, 60, 0.3);
-    animation: shake 0.1s infinite;
+    animation: shake 0.2s infinite;
 }
 
 @keyframes shake {
-    0% { transform: translate(1px, 1px); }
-    50% { transform: translate(-1px, -2px); }
-    100% { transform: translate(1px, 1px); }
+    0% { transform: translate(0,0); }
+    25% { transform: translate(2px, 2px); }
+    75% { transform: translate(-2px, -2px); }
+    100% { transform: translate(0,0); }
 }
-
-/* The Rest of the Death Screen/Start Screen remain hidden/styled as before */
-.hidden { display: none !important; }
