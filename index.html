@@ -11,7 +11,7 @@
 
     <div id="start-screen">
         <div class="glitch-wrapper">
-            <h1 class="glitch" data-text="THE TETHER">THE TETHER</h1>
+            <h1 class="glitch">THE TETHER</h1>
         </div>
         <p>COOPERATION IS THE ONLY LOGIC.</p>
         <button id="init-button">INITIATE LINK</button>
@@ -19,25 +19,23 @@
 
     <div id="ui-overlay" class="hidden">
         <div id="connection-status">
-            <div class="status-label">TETHERED TO: <span id="partner-id">SEARCHING...</span></div>
+            <div class="status-label">TETHERED TO: <span id="partner-id">REMOTE_HOST_01</span></div>
             <div id="sync-bar-container">
                 <div id="sync-level"></div>
             </div>
-            <div class="status-label">SYNC STABILITY: <span id="sync-percent">0%</span></div>
+            <div class="status-label">SYNC STABILITY: <span id="sync-percent">100%</span></div>
         </div>
 
         <div id="game-stats">
             <div class="stat">VELOCITY: <span id="speed">0</span> m/s</div>
             <div class="stat">DISTANCE: <span id="distance">0</span>m</div>
         </div>
-
-        <div id="comms-hint">PRESS [SPACE] TO SEND PULSE</div>
     </div>
 
     <div id="death-screen" class="hidden">
-        <h1>CONNECTION SEVERED</h1>
-        <p>YOUR PARTNER FAILED. YOU HAVE BEEN RECALIBRATED.</p>
-        <button onclick="location.reload()">RE-TETHER</button>
+        <h1 class="glitch">CONNECTION SEVERED</h1>
+        <p>YOUR PARTNER HAS BEEN LOST TO THE VOID.</p>
+        <button onclick="location.reload()">RE-INITIATE</button>
     </div>
 
     <audio id="bg-music" loop src="Game.mp3"></audio>
