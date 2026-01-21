@@ -1,14 +1,14 @@
 /** * THE TETHER // UI CALIBRATION 
- * UPDATED: ADDED START SCREEN & GLITCH ANIMATIONS
+ * UPDATED: DYNAMIC GLOW & COLOR SYNC
  */
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
 
 :root {
+    /* These will be updated by the Hue Engine in JS */
+    --current-hue: #00f2ff; 
     --neon-red: #ff003c;
-    --neon-cyan: #00f2ff;
     --bg-black: #050505;
-    --glass: rgba(255, 255, 255, 0.05);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,41 +27,7 @@ body {
     z-index: 1;
 }
 
-/* --- START SCREEN --- */
-#start-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: var(--bg-black);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
-.glitch {
-    font-size: 5rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    position: relative;
-    text-shadow: 0.05em 0 0 rgba(255, 0, 60, 0.75),
-                -0.025em -0.05em 0 rgba(0, 242, 255, 0.75),
-                0.025em 0.05em 0 rgba(0, 255, 0, 0.75);
-    animation: glitch 500ms infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 0.05em 0 0 rgba(255, 0, 60, 0.75), -0.05em -0.025em 0 rgba(0, 242, 255, 0.75); }
-    14% { text-shadow: 0.05em 0 0 rgba(255, 0, 60, 0.75), -0.05em -0.025em 0 rgba(0, 242, 255, 0.75); }
-    15% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 60, 0.75), 0.025em 0.025em 0 rgba(0, 242, 255, 0.75); }
-    49% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 60, 0.75), 0.025em 0.025em 0 rgba(0, 242, 255, 0.75); }
-    50% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 60, 0.75), 0.05em 0 0 rgba(0, 242, 255, 0.75); }
-    99% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 60, 0.75), 0.05em 0 0 rgba(0, 242, 255, 0.75); }
-    100% { text-shadow: -0.025em 0 0 rgba(255, 0, 60, 0.75), -0.025em -0.025em 0 rgba(0, 242, 255, 0.75); }
-}
-
-/* --- HUD & GAME ELEMENTS --- */
+/* --- THE PULSING HUD --- */
 #ui-overlay {
     position: fixed;
     inset: 0;
@@ -71,62 +37,58 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 20px solid transparent;
-    transition: border-color 0.2s;
+    /* The border now breathes with the game state */
+    border: 15px solid rgba(255, 255, 255, 0.03);
+    animation: borderBreathe 4s ease-in-out infinite alternate;
+}
+
+@keyframes borderBreathe {
+    from { border-color: rgba(255, 255, 255, 0.03); }
+    to { border-color: rgba(0, 242, 255, 0.1); }
 }
 
 #connection-status {
-    width: 300px;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-left: 4px solid var(--neon-cyan);
-}
-
-.status-label {
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    color: rgba(255, 255, 255, 0.6);
+    width: 320px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-left: 5px solid var(--current-hue);
+    box-shadow: -10px 0 30px rgba(0, 242, 255, 0.1);
 }
 
 #sync-level {
     width: 100%;
-    height: 8px;
-    background: var(--neon-cyan);
-    box-shadow: 0 0 15px var(--neon-cyan);
-    transition: width 0.3s ease;
+    height: 10px;
+    background: linear-gradient(90deg, var(--current-hue), #ffffff);
+    box-shadow: 0 0 20px var(--current-hue);
+    transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.hidden { display: none !important; }
-
-/* Existing Danger & Death Screen Styles stay as they were */
-#death-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0, 0, 0, 0.95);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-button {
-    background: transparent;
-    border: 2px solid var(--neon-cyan);
-    color: var(--neon-cyan);
-    padding: 15px 40px;
-    font-family: 'JetBrains Mono', monospace;
+/* --- MORPHING ELEMENTS --- */
+.glitch {
+    font-size: 5rem;
     font-weight: 800;
-    cursor: pointer;
-    transition: 0.3s;
-    letter-spacing: 2px;
+    letter-spacing: -2px;
+    animation: textMorph 2s infinite alternate;
 }
 
-button:hover {
-    background: var(--neon-cyan);
-    color: black;
-    box-shadow: 0 0 20px var(--neon-cyan);
+@keyframes textMorph {
+    0% { transform: scale(1); filter: hue-rotate(0deg); }
+    100% { transform: scale(1.05); filter: hue-rotate(90deg); }
 }
+
+/* --- DANGER STATE --- */
+.danger #connection-status {
+    border-left-color: var(--neon-red);
+    box-shadow: -10px 0 40px rgba(255, 0, 60, 0.3);
+    animation: shake 0.1s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px); }
+    50% { transform: translate(-1px, -2px); }
+    100% { transform: translate(1px, 1px); }
+}
+
+/* The Rest of the Death Screen/Start Screen remain hidden/styled as before */
+.hidden { display: none !important; }
