@@ -1,8 +1,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
 
 /**
- * THE TETHER // NEON OBLIVION ENGINE
- * Features: Multi-Neon Morphing, Mobile Touch, and Kinetic Physics
+ * THE TETHER // FINAL OPTIMIZED ENGINE
  */
 
 let speed = 0.22;
@@ -12,7 +11,6 @@ let isGameOver = false;
 let gameStarted = false;
 let time = 0;
 
-// UI & Audio References
 const bgMusic = document.getElementById('bg-music');
 const startBtn = document.getElementById('init-button');
 const touchBtn = document.getElementById('touch-pulse');
@@ -25,7 +23,7 @@ function startGame() {
     gameStarted = true;
     startScreen.classList.add('hidden');
     uiOverlay.classList.remove('hidden');
-    bgMusic.play();
+    bgMusic.play().catch(() => console.log("Audio needs interaction"));
     bgMusic.volume = 0.6;
     animate();
 }
@@ -35,25 +33,29 @@ startBtn.addEventListener('click', startGame);
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#game-canvas'), antialias: true });
+const renderer = new THREE.WebGLRenderer({ 
+    canvas: document.querySelector('#game-canvas'), 
+    antialias: true,
+    alpha: true 
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// --- THE MULTI-NEON TUNNEL ---
-// We use massive segment counts for "Mind-Blowing" smooth morphing
+// --- MORPHING TUNNEL ---
+// We use 128 radial segments for high-definition "liquid" edges
 const tunnelGeometry = new THREE.CylinderGeometry(5, 5, 100, 128, 32, true);
 const tunnels = [];
 
 for (let i = 0; i < 3; i++) {
-    const material = new THREE.MeshPhongMaterial({ 
+    const mat = new THREE.MeshPhongMaterial({ 
         color: 0xffffff, 
         wireframe: true, 
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.8,
         side: THREE.BackSide,
-        blending: THREE.AdditiveBlending // Makes the colors glow/stack
+        blending: THREE.AdditiveBlending 
     });
-    const t = new THREE.Mesh(tunnelGeometry, material);
+    const t = new THREE.Mesh(tunnelGeometry, mat);
     t.rotation.x = Math.PI / 2;
     t.position.z = -i * 100;
     scene.add(t);
@@ -62,43 +64,46 @@ for (let i = 0; i < 3; i++) {
 
 const light = new THREE.PointLight(0xffffff, 3, 150);
 scene.add(light);
-scene.add(new THREE.AmbientLight(0x111111));
+scene.add(new THREE.AmbientLight(0x222222));
 
-// --- GAME LOGIC ---
-function triggerPulse() {
+// --- INPUT LOGIC ---
+function triggerPulse(e) {
+    if (e) e.preventDefault();
     if (!gameStarted || isGameOver) return;
+    
     if (partnerHealth < 100) {
-        partnerHealth = Math.min(100, partnerHealth + 14);
-        speed *= 0.8; // Kinetic penalty
+        partnerHealth = Math.min(100, partnerHealth + 15);
+        speed *= 0.82; // The "Altruism Penalty"
         
-        // Flash Effect
-        renderer.setClearColor(0xffffff, 0.2);
-        setTimeout(() => renderer.setClearColor(0x000000, 1), 40);
+        // Visual feedback
+        renderer.setClearColor(0xffffff, 0.1);
+        setTimeout(() => renderer.setClearColor(0x000000, 0), 50);
     }
 }
 
-// Controls: Keyboard + Touch
 window.addEventListener('keydown', (e) => { if (e.code === 'Space') triggerPulse(); });
-touchBtn.addEventListener('touchstart', (e) => { e.preventDefault(); triggerPulse(); });
+touchBtn.addEventListener('touchstart', triggerPulse, { passive: false });
 touchBtn.addEventListener('mousedown', triggerPulse);
 
 function updateTether() {
     if (isGameOver || !gameStarted) return;
 
-    partnerHealth -= (Math.random() > 0.97 ? Math.random() * 8 : 0.18);
+    // Stochastic decay
+    partnerHealth -= (Math.random() > 0.95 ? Math.random() * 7 : 0.15);
 
     if (partnerHealth < 35) {
         document.body.classList.add('danger');
-        bgMusic.playbackRate = 0.88; 
+        bgMusic.playbackRate = 0.9;
     } else {
         document.body.classList.remove('danger');
-        bgMusic.playbackRate = 1.05; // Slightly faster music as you go
+        bgMusic.playbackRate = 1.0;
     }
 
+    // Sync HUD
     document.getElementById('sync-level').style.width = `${Math.max(0, partnerHealth)}%`;
-    document.getElementById('sync-percent').innerText = Math.floor(partnerHealth);
+    document.getElementById('sync-percent').innerText = Math.floor(Math.max(0, partnerHealth));
     document.getElementById('distance').innerText = Math.floor(distance);
-    document.getElementById('speed').innerText = (speed * 120).toFixed(0);
+    document.getElementById('speed').innerText = (speed * 100).toFixed(0);
 
     if (partnerHealth <= 0) {
         isGameOver = true;
@@ -114,41 +119,34 @@ function animate() {
 
     time += 0.015; 
 
-    // MIND-BLOWING COLOR MATH
-    const mainHue = (time * 0.15) % 1; 
-    const secondaryHue = (mainHue + 0.33) % 1; // Triadic color scheme
-    const tertiaryHue = (mainHue + 0.66) % 1;
-
-    // Bridge to CSS
-    document.documentElement.style.setProperty('--current-hue', `hsl(${mainHue * 360}, 100%, 60%)`);
+    // COLOR LOGIC
+    const mainHue = (time * 0.1) % 1; 
+    const cssColor = `hsl(${mainHue * 360}, 100%, 60%)`;
+    document.documentElement.style.setProperty('--current-hue', cssColor);
 
     tunnels.forEach((t, index) => {
         t.position.z += speed;
         
-        // COMPLEX MORPHING
-        // Combines two sine waves for unpredictable "liquid" movement
-        const morph = 1 + (Math.sin(time + index) * 0.3) + (Math.cos(time * 0.5) * 0.1);
-        t.scale.set(morph, morph, 1);
-        
-        // Counter-rotation for kaleidoscope effect
-        t.rotation.z += (index % 2 === 0 ? 0.003 : -0.003);
+        // LIQUID MORPHING MATH
+        // Uses time-based sin/cos to make the tunnel "wobble" organically
+        const wave = 1 + (Math.sin(time + index) * 0.3) + (Math.cos(time * 0.7) * 0.1);
+        t.scale.set(wave, wave, 1);
+        t.rotation.z += (index % 2 === 0 ? 0.002 : -0.002);
 
-        // Multi-Color Morphing: Each tunnel section has a slightly shifted hue
-        const sectionHue = (mainHue + (index * 0.1)) % 1;
+        // Multi-Tone Color
+        const sectionHue = (mainHue + (index * 0.05)) % 1;
         t.material.color.setHSL(sectionHue, 0.9, 0.6);
 
         if (t.position.z > 50) t.position.z = -250;
     });
 
-    // Dynamic Lighting
-    light.color.setHSL(secondaryHue, 1, 0.5);
-    light.position.set(Math.sin(time) * 5, Math.cos(time) * 5, -20);
+    // Environment Lighting
+    light.color.setHSL((mainHue + 0.5) % 1, 1, 0.5);
+    const bgColor = new THREE.Color().setHSL(mainHue, 0.5, 0.02);
+    scene.background = bgColor;
+    scene.fog = new THREE.FogExp2(bgColor, 0.08);
 
-    const sceneColor = new THREE.Color().setHSL(mainHue, 0.6, 0.02);
-    scene.background = sceneColor;
-    scene.fog = new THREE.FogExp2(sceneColor, 0.07);
-
-    speed += 0.0002; 
+    speed += 0.00015; 
     distance += speed;
     updateTether();
     renderer.render(scene, camera);
