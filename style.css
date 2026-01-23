@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
 
 :root {
-    /* These variables are controlled by main.js */
-    --current-hue: hsl(180, 100%, 50%); 
+    --current-hue: hsl(180, 100%, 50%);
     --neon-red: #ff003c;
     --bg-black: #050505;
+    --terminal-green: #00ff41;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     background-color: var(--bg-black);
@@ -15,123 +15,113 @@ body {
     font-family: 'JetBrains Mono', monospace;
     overflow: hidden;
     height: 100vh;
+    user-select: none;
+}
+
+/* --- THE NEON VFX LAYER --- */
+.vfx-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    opacity: 0.3;
 }
 
 #game-canvas {
     position: fixed;
     inset: 0;
     z-index: 1;
+    filter: contrast(1.2) brightness(1.1) saturate(1.5);
 }
 
-/* --- START SCREEN --- */
-#start-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: var(--bg-black);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
+/* --- GLITCH TITLE --- */
 .glitch {
-    font-size: clamp(3rem, 10vw, 5rem);
+    font-size: clamp(2.5rem, 12vw, 6rem);
     font-weight: 800;
-    text-transform: uppercase;
-    position: relative;
     color: var(--current-hue);
-    text-shadow: 2px 2px var(--neon-red);
-    transition: color 0.1s ease;
+    text-shadow: 3px 0px var(--neon-red), -3px 0px var(--terminal-green);
+    animation: flicker 0.15s infinite;
 }
 
-/* --- HUD OVERLAY --- */
+@keyframes flicker {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+/* --- HUD & BARS --- */
 #ui-overlay {
     position: fixed;
     inset: 0;
     z-index: 10;
     pointer-events: none;
-    padding: 30px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 15px solid rgba(255, 255, 255, 0.03);
-    transition: border-color 0.5s ease;
 }
 
 #connection-status {
-    width: 320px;
-    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
     padding: 20px;
-    border-left: 5px solid var(--current-hue);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--current-hue);
+    box-shadow: 0 0 20px var(--current-hue);
 }
 
 #sync-level {
     width: 100%;
-    height: 10px;
-    background: var(--current-hue);
-    box-shadow: 0 0 20px var(--current-hue);
-    transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    height: 15px;
+    background: linear-gradient(90deg, var(--current-hue), #fff);
+    box-shadow: 0 0 30px var(--current-hue);
+    transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.status-label {
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-#game-stats {
-    align-self: flex-end;
-    text-align: right;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 15px;
-    border-right: 5px solid var(--current-hue);
-}
-
-/* --- GAME OVER SCREEN --- */
-#death-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0, 0, 0, 0.9);
+/* --- VIRTUAL SPACE BAR (MOBILE CONTROLS) --- */
+#mobile-controls {
+    pointer-events: auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
-button {
-    background: transparent;
+#touch-pulse {
+    width: 90%;
+    max-width: 500px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
     border: 2px solid var(--current-hue);
     color: var(--current-hue);
-    padding: 15px 40px;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
     font-weight: 800;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: 0.3s;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px var(--current-hue);
+    transition: all 0.1s;
 }
 
-button:hover {
+#touch-pulse:active {
     background: var(--current-hue);
     color: black;
+    transform: scale(0.95);
+}
+
+/* --- DANGER STATE --- */
+.danger .vfx-layer {
+    background: rgba(255, 0, 60, 0.1);
+    animation: alarm 0.5s infinite alternate;
+}
+
+@keyframes alarm {
+    from { opacity: 0.1; }
+    to { opacity: 0.4; }
 }
 
 .hidden { display: none !important; }
-
-/* Danger State Shake */
-.danger #connection-status {
-    border-left-color: var(--neon-red);
-    animation: shake 0.2s infinite;
-}
-
-@keyframes shake {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(2px, 2px); }
-    75% { transform: translate(-2px, -2px); }
-    100% { transform: translate(0,0); }
-}
